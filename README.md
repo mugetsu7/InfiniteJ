@@ -45,14 +45,8 @@ is updated to
 $.ajax({url:url , dataType:'json', async : false, data:{}, success:function(data)
 ```
 
-## Dependencies:
-To use InfiniteJ, you will need:
-- Your Echonest's API_KEY for policy file
-- Your own directory for uploading song and update it in upload.php
-- Update the link directing to your directory in index, upload, and loader file
-
-The user can use the command below to download necessary file for the InfiniteJ to run independently:
+Moreover, the directory is missing the javascript file Underscore. Therefore, I downloaded it from http://underscorejs.org/ and put it in my directory while call it in index.html
 ```python
-wget url . 
+<script src="underscore.js" type="text/javascript"></script>
 ```
 
