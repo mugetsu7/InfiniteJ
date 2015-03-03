@@ -1,8 +1,23 @@
 # InfiniteJ
 InfiniteJukebox version on student server.
+Credits and Copyright to Paul Lamere (original creator of InfiniteJukebox)
 
 ## Problem
 InfiniteJukebox sparks a lot of conversations and ideas in the field of Music Informatics. Therefore, I want to investigate on how to make Infinite Jukebox on student server so it become accessible to other users in the community to apply and alter it for their own research project.
+
+## Process 
+InfiniteJ put any uploaded song in the storage directory in student server while changing it's name then call Echonest for audio analysis request to output the visualization of beat similarity and a music box that play a song infinitely by comparing similar beats.  
+
+## Dependencies:
+To use InfiniteJ, you will need:
+- Your Echonest's API_KEY for policy file
+- Your own directory for uploading song and update it in upload.php
+- Update the link directing to your directory in index, upload, and loader file
+
+The user can use the command below to download necessary file for the InfiniteJ to run independently:
+```python
+wget url . 
+```
 
 ## Code Explanation
 Looking at the code for the InfiniteJukebox at the moment, the option of uploading the song would puts the song in the amazon web services and then call Echonest for the analysis of the song. However, we need to change the storing option to the local folder on the student server. 
@@ -34,6 +49,7 @@ $.ajax({url:url , dataType:'json', async : false, data:{}, success:function(data
 To use InfiniteJ, you will need:
 - Your Echonest's API_KEY for policy file
 - Your own directory for uploading song and update it in upload.php
+- Update the link directing to your directory in index, upload, and loader file
 
 The user can use the command below to download necessary file for the InfiniteJ to run independently:
 ```python
