@@ -6,7 +6,7 @@ Credits and Copyright to Paul Lamere (original creator of InfiniteJukebox)
 InfiniteJukebox sparks a lot of conversations and ideas in the field of Music Informatics. Therefore, I want to investigate on how to make Infinite Jukebox on student server so it become accessible to other users in the community to apply and alter it for their own research project.
 
 ## Process 
-InfiniteJ put any uploaded song in the storage directory in student server while changing it's name then call Echonest for audio analysis request to output the visualization of beat similarity and a music box that play a song infinitely by comparing similar beats.  
+InfiniteJ's users either play songs that already exists in the suggesting database or upload any songs that the users want. InfiniteJ would put the uploaded song in the storage directory in student server while changing it's name then call Echonest for audio analysis request to output the visualization of beat similarity and a music box that play a song infinitely and everchaningly. It break the song into beats and play the song beat by beat. At every beat there's a chance that it will jump to a different part of song that happens to sound very similar to the current beat. 
 
 ## Dependencies:
 To use InfiniteJ, you will need:
