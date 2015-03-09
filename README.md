@@ -8,7 +8,7 @@ InfiniteJukebox sparks a lot of conversations and ideas in the field of Music In
 ## Process 
 InfiniteJ's users either play songs that already exists in the suggesting database or upload any songs that the users want. InfiniteJ would put the uploaded song in the storage directory in student server while changing it's name then call Echonest for audio analysis request to output the visualization of beat similarity and a music box that play a song infinitely and everchaningly. It break the song into beats and play the song beat by beat. At every beat there's a chance that it will jump to a different part of song that happens to sound very similar to the current beat. 
 
-## Dependencies:
+## Dependencies
 To use InfiniteJ, you will need:
 - Your Echonest's API_KEY for policy file
 - Your own directory for uploading song and update it in upload.php
@@ -20,7 +20,7 @@ wget url .
 ```
 
 ## Code Explanation
-After making an upload.php and a directory to keep all the files for audio analysing works, Dr. Parry advised me to insert these following lines of code in order for loader.html to call Echonest for audio analysing works for all uploading files in : 
+After making an upload.php and a directory to keep all the files for audio analysing works, Dr. Parry advised me to insert these following lines of code in upload.php in order for loader.html to call Echonest for audio analysing works for all uploading files from the user: 
 ```python
 $url = $_POST["success_action_redirect"].'?bucket=student.cs.appstate.edu/~tuhq/infiniteJ&key='.urlencode($_POST["key"]);
 echo $url. "<br />";
