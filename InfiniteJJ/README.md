@@ -1,18 +1,19 @@
 # InfiniteJ
-InfiniteJukebox version on student server.
-Credits and Copyright to Paul Lamere (original creator of InfiniteJukebox)
+InfiniteJukebox Transition Detection Game called InfiniteJJ
+Credits and Copyright to Paul Lamere (original creator of [InfiniteJukebox])
 
 ## Problem
-InfiniteJukebox sparks a lot of conversations and ideas in the field of Music Informatics. Therefore, I want to investigate on how to make Infinite Jukebox on student server so it become accessible to other users in the community to apply and alter it for their own research project.
+We want to investigate on how to judge the users on their ability to identify the occurrence of transitions of the song on Infinite Jukebox.
 
 ## Process 
-InfiniteJ's users either play songs that already exists in the suggesting database or upload any songs that the users want. InfiniteJ would put the uploaded song in the storage directory in student server while changing it's name then call Echonest for audio analysis request to output the visualization of beat similarity and a music box that play a song infinitely and everchaningly. It break the song into beats and play the song beat by beat. At every beat there's a chance that it will jump to a different part of song that happens to sound very similar to the current beat. 
+InfiniteJJ would play a song and for every transition the song makes that one hears, one has 4 beats to press the plus button on the side pad of the keyboard to indicate that transition. After 4 beats, one would lose a point because one fail to detect the transition at that specific time. Moreover, if one pressed the plus button without hearing the transition in the song, one would also lose point because one falsely assume the transition when it is not there. 
 
 ## Dependencies
-To use InfiniteJ, you will need:
+To use InfiniteJJ, you will need:
 - Your Echonest's API_KEY for policy file
 - Your own directory for uploading song and update it in upload.php
 - Update the link directing to your directory in index, upload, and loader file
+- The song that you want to play the Transition Detection Game with (possibly uploading your own song)
 
 The user can use the command below to download necessary file for the InfiniteJ to run independently:
 ```python
@@ -20,48 +21,29 @@ wget url .
 ```
 
 ## Code Explanation
-After making an upload.php and a directory to keep all the files for audio analysing works, Dr. Parry advised me to insert these following lines of code in upload.php in order for loader.html to call Echonest for audio analysing works for all uploading files from the user: 
-```python
-$url = $_POST["success_action_redirect"].'?bucket=student.cs.appstate.edu/~tuhq/infiniteJ&key='.urlencode($_POST["key"]);
-echo $url. "<br />";
-echo $_POST["success_action_redirect"];
-```
-The audio analysing works are called in loader.html in:
-```python
-<input type="hidden" name="success_action_redirect" value= "http://student.cs.appstate.edu/~tuhq/infiniteJ/index.html">
-```
+There are five necessary variables listed below:
+- flag: boolean variable that allows the transition to be considered only after 4 beats since the song makes its transition 
+- flagN: boolean variable to indicate that user did not press the plus keyboard after 4 beats since the song makes its transition 
+- actual_transition: counter that counts the occurrence of the transitions that song is currently making
+- detected_transition: counter that counts the transitions that the user detects correctly
+- false_positiveT: counter that counts the song's transitions that the user detects falsely
+- false_negativeT: counter that counts the song's transitions that the user missed 
 
-Looking at the code for the [InfiniteJukebox] at the moment, the option of uploading the song would puts the song in the amazon web services and then call Echonest for the analysis of the song. However, we need to change the storing option to the local folder on the student server. 
-For instance: 
-```python
-<form action="https://s3.amazonaws.com/static.echonest.com" method="post" enctype="multipart/form-data">
-	<input id='f-key' type="hidden" name="AWSAccessKeyId" value="YOUR_AWS_ACCESS_KEY">
-	<input type="hidden" name="success_action_redirect" value="http://labs.echonest.com/Uploader/index.html">
-	<input id='f-policy' type="hidden" name="policy" value="YOUR_POLICY_DOCUMENT_BASE64_ENCODED">
-	<input id='f-signature' type="hidden" name="signature" value="YOUR_CALCULATED_SIGNATURE"> 
-```
-The code makes a form to Amazon web services with AWSAccessKeyId and other variables that are not in my possession. Therefore, it would be updated with my own upload form in php to upload mp3 and storage space directing to my directory for mp3 file to:
-```python
-<form enctype="multipart/form-data" action="upload.php" method="POST">
-	<input type="hidden" name="success_action_redirect" value= "http://student.cs.appstate.edu/~tuhq/infiniteJ/index.html">
-```
-Moreover, I updated the Echonest's API_KEY to my Echonest's API_KEY instead of abusing their API_Key. 
-I called fetchSignature() as a first thing in init() function to fetch in the API_KEY before analyzeAudio get called so Echonest can look at the file. However, there was a problem initially with fetchSignature() fetching the signature slower due to one of the aspects of .getJSON so analyzeAudio ran before API_KEY got fetched to my API_KEY so I updated fetchSignature() function by using the function .ajax instead that force fetchSignature to fetch my API_KEY variable first before doing anything else. ([jQuery])
-Specifically:
-```python
-$.getJSON(url, {}, function(data) {
-```
-is updated to
-```python
-$.ajax({url:url , dataType:'json', async : false, data:{}, success:function(data)
-```
+I made the table that have all the information for the four types of transitions below the figure including actual_transition, detected_transition, false_positiveT, and false_negativeT. I got the table format from[CodePen Table] then I incorporated that to my style.css to make the table looks more attractive and easy to see. 
 
-Moreover, the directory is missing the javascript file Underscore so "_" is treated as undefined variable. Therefore, I downloaded the file from [Underscore] and put it in my directory while call it in index.html
+This sample part of the code shows how the first row of the DATA table is constructed. The variable that I want to show would be assigned an unique key id such as <p id="demo"></p> which would be updated or assigned inside the javascript section of the code. 
 ```python
-<script src="underscore.js" type="text/javascript"></script>
+<center> <h1>DATA</h1> <center>
+			<center> <table class="rwd-table">
+				<tr>
+					<th>Actual Transitions</th>
+					<td data-th="Actual Transitions"><p id="demo"></p></td>
+				</tr>
 ```
-
-[jQuery]: http://www.dotnetbull.com/2012/07/jquery-post-vs-get-vs-ajax.html
-[Underscore]:http://underscorejs.org/
+Then inside the javascript section of index.html of [InfiniteJukebox], everytime the variable I want to show gets updated, I posted them to the table with document.getElementById(variable's unique id) = Number(variable's name).toString(10) with .toString(10) indicates that we are using decimal instead of hexadecimal or binary. For instance,
+```python
+document.getElementById("demo").innerHTML = Number(actual_transition).toString(10);
+```
+[CodePen Table]: http://codepen.io/anon/share/zip/KwEJRB/
 [InfiniteJukebox]: http://labs.echonest.com/Uploader/index.html
 
