@@ -1,15 +1,16 @@
 # InfiniteJ
-InfiniteJukebox Transition Detection Game called InfiniteJJ
+Enhanced InfiniteJukebox Transition Detection Game called InfiniteJJJ
 Credits and Copyright to Paul Lamere (original creator of [InfiniteJukebox])
 
 ## Problem
-We want to investigate on how to judge the users on their ability to identify the occurrence of transitions of the song on Infinite Jukebox.
+We want to investigate on how to judge the users on their ability to identify the occurrence of transitions of the song on Infinite Jukebox. 
+We also want to implement different ways to improve the entertaining aspect of the game while documenting the records of the game for future researches purposes.
 
 ## Process 
-InfiniteJJ would play a song and for every transition the song makes that one hears, one has 4 beats to press the plus button on the side pad of the keyboard to indicate that transition. After 4 beats, one would lose a point because one fail to detect the transition at that specific time. Moreover, if one pressed the plus button without hearing the transition in the song, one would also lose point because one falsely assume the transition when it is not there. 
+InfiniteJJJ would let the user score more points when the user can either consecutively detect actual transition or detect the actual transition fast or both. Moreover, InfiniteJJJ would also take more points away from the user if the user either falsely detect the transition or miss the transition consecutively. Moreover, there would be also an option for the user to download their report for that session as well.   
 
 ## Dependencies
-To use InfiniteJJ, you will need:
+To use InfiniteJJJ, you will need:
 - Your Echonest's API_KEY for policy file
 - Your own directory for uploading song and update it in upload.php
 - Update the link directing to your directory in index, upload, and loader file
@@ -21,29 +22,59 @@ wget url .
 ```
 
 ## Code Explanation
-There are five necessary variables listed below:
-- flag: boolean variable that allows the transition to be considered only after 4 beats since the song makes its transition 
-- flagN: boolean variable to indicate that user did not press the plus keyboard after 4 beats since the song makes its transition 
-- actual_transition: counter that counts the occurrence of the transitions that song is currently making
-- detected_transition: counter that counts the transitions that the user detects correctly
-- false_positiveT: counter that counts the song's transitions that the user detects falsely
-- false_negativeT: counter that counts the song's transitions that the user missed 
+There are four more necessary variables listed below:
+- flagD: boolean variable that force the user to only count the detected transition once
+- bonusN: counter that counts the transitions that the user missed or falsely detected consecutively
+- bonusP: counter that counts the actual transitions that the user detected consecutively 
+- continuityN: boolean variable that checked if the user missed or falsely detected a transition in previous move
+- continuityN: boolean variable that checked if the user accurately detected a transition in previous move
+- totalS: total score of the user that starts with 20 points that is updated everytime the three main variables (false_positiveT, detected_transition, and false_negativeT) get updated.
 
-I made the table called DATA that have all the information for the four types of transitions below the figure including actual_transition, detected_transition, false_positiveT, and false_negativeT. I got the table format from[CodePen Table] then I incorporated that to my style.css to make the table looks more attractive and easy to see. 
+As mentioned previously, the faster the user can detect the transition, the more points the user get. For every time in the row the user accurately detect a transition, the point of that specific would multiply with the number of consecutive detected transition. 
+```python
+if(flag)
+{
+	if(flagD)
+	{	
+		bonusN = 0;
+		if(continuity)
+		{
+			bonusP++;
+		}
+		else
+		{
+			continuity = true;
+			bonusP++;
+		}
+		detected_transition++;
+		totalS += (5 - beats_since_branch) * bonusP;
+		flagD = false;
+	}
+	flagN = false;	
+}
+```
+In case of consecutively falsely detecting the transition, it is similar to the previous case but there are higher chances for the user to falsely detect than accurately detect a transition so I came up with this condition:
 
-This sample part of the code shows how the first row of the DATA table is constructed. The variable that I want to show would be assigned an unique key id such as <p id="demo"></p> which would be updated or assigned inside the javascript section of the code. 
 ```python
-<center> <h1>DATA</h1> <center>
-			<center> <table class="rwd-table">
-				<tr>
-					<th>Actual Transitions</th>
-					<td data-th="Actual Transitions"><p id="demo"></p></td>
-				</tr>
+if(bonusN >= 4)
+{		
+	totalS -= (bonusN - 2)*(bonusN - 1);
+}
+else
+{
+	totalS--;
+}
 ```
-Then inside the javascript section of index.html of [InfiniteJukebox], everytime the variable I want to show gets updated, I posted them to the table with document.getElementById(variable's unique id) = Number(variable's name).toString(10) with .toString(10) indicates that we are using decimal instead of hexadecimal or binary. For instance,
+It was difficult to figure out how to document the record of the user in that one session to a text file and output a downloadable version of it. 
+Inside the html code block of [InfiniteJukebox], I create a text area but not displaying it so the user cannot mess with it. I also create a "Create File" button to output the text area into a downloadable report text file.  
+```html
+<input type="text" id="mytext" style = "display: none"> 
+<button id="create">Create file</button> <a download="info.txt" id="downloadlink" style="display: none">Download</a>
+```
+Inside the javascript code block of [InfiniteJukebox], I create the variable called elem that has the control over the text area so I can updated just like using console.log to log all the records inside the text area which will be converted into a text file when the user click on the "Create File" button
 ```python
-document.getElementById("demo").innerHTML = Number(actual_transition).toString(10);
+var elem = document.getElementById("mytext");
 ```
-[CodePen Table]: http://codepen.io/anon/share/zip/KwEJRB/
+[Input Field]: http://stackoverflow.com/questions/7609130/set-the-value-of-a-input-field-with-javascript
 [InfiniteJukebox]: http://labs.echonest.com/Uploader/index.html
 
