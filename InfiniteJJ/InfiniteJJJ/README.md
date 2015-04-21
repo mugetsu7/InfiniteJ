@@ -27,7 +27,7 @@ There are four more necessary variables listed below:
 - bonusN: counter that counts the transitions that the user missed or falsely detected consecutively
 - bonusP: counter that counts the actual transitions that the user detected consecutively 
 - continuityN: boolean variable that checked if the user missed or falsely detected a transition in previous move
-- continuityN: boolean variable that checked if the user accurately detected a transition in previous move
+- continuityP: boolean variable that checked if the user accurately detected a transition in previous move
 - totalS: total score of the user that starts with 20 points that is updated everytime the three main variables (false_positiveT, detected_transition, and false_negativeT) get updated.
 
 As mentioned previously, the faster the user can detect the transition, the more points the user get. For every time in the row the user accurately detect a transition, the point of that specific would multiply with the number of consecutive detected transition. 
@@ -65,7 +65,7 @@ else
 	totalS--;
 }
 ```
-It was difficult to figure out how to document the record of the user in that one session to a text file and output a downloadable version of it. 
+It was difficult to figure out how to document the record of the user in that one session to a text file and output a downloadable version of it. From [Input Field] and [Downloadable Textfile] question on stackoverflow.com, I got the idea 
 Inside the html code block of [InfiniteJukebox], I create a text area but not displaying it so the user cannot mess with it. I also create a "Create File" button to output the text area into a downloadable report text file.  
 ```html
 <input type="text" id="mytext" style = "display: none"> 
@@ -77,4 +77,5 @@ var elem = document.getElementById("mytext");
 ```
 [Input Field]: http://stackoverflow.com/questions/7609130/set-the-value-of-a-input-field-with-javascript
 [InfiniteJukebox]: http://labs.echonest.com/Uploader/index.html
+[Downloadable Textfile]: http://jsfiddle.net/UselessCode/qm5AG/
 
