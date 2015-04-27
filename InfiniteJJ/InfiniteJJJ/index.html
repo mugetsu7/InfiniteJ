@@ -73,14 +73,20 @@
                 js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
             </span>
         </div>
-		<div id='tiles'></div> 
+		<div id='tiles' style = "display: none"></div> 
+		<br> </br>
+		<center> <div >
+			<center> 
+			<img id="myImg" src="http://oyster.ignimgs.com/wordpress/write.ign.com/19477/2013/07/Press-Start-600x375.jpg" width="250" height="250">
+			</center>
+		</div> </center>
+		<br> </br>
 		
 		<center> <h1>DATA</h1> <center>
 			<center> <table class="rwd-table">
-				<tr>
+				<tr >
 					<th>Actual Transitions</th>
 					<td data-th="Actual Transitions"><p id="demo"></p></td>
-					
 				</tr>
 				<tr>
 					<th>Detected Transitions</th>
@@ -93,6 +99,10 @@
 				<tr>
 					<th>False Negative Transitions</th>
 					<td data-th="False Negative Transitions"><p id="demo3"></p></td>
+				</tr>
+				<tr>
+					<th>Total Score</th>
+					<td data-th="Total Score"><p id="demo4"></p></td>
 				</tr>
 				
 			</table> </center>
@@ -235,16 +245,22 @@ var controlled = false;
 
 var flag = false;
 var flagN = false;
+var flagD = false;
 var detected_transition = 0;
 var false_positiveT = 0;
 var false_negativeT = 0;
 var beats_since_branch = 0;
-var B_Tile = 0
+var B_Tile = 0;
+var totalS = 0;
+var bonusP = 0;
+var bonusN = 0;
 
 var minTileWidth = 10;
 var maxTileWidth = 90;
 var growthPerPlay = 10;
 var curGrowFactor = 1;
+
+
 
 var API_KEY = 0;
 
@@ -551,10 +567,13 @@ function gotTheAnalysis(profile) {
                 info('Trouble  ' + t.status);
                 setDisplayMode(false);
             }
+			totalS = 1;
+			//totalS = 20;
 			document.getElementById("demo").innerHTML = Number(0).toString(10);
 			document.getElementById("demo1").innerHTML = Number(0).toString(10);
 			document.getElementById("demo2").innerHTML = Number(0).toString(10);
 			document.getElementById("demo3").innerHTML = Number(0).toString(10);
+			document.getElementById("demo4").innerHTML = Number(totalS).toString(10);
         });
     } else if (status == 'error') {
         info("Sorry, couldn't analyze that track");
@@ -666,14 +685,12 @@ function fetchSignature() {
     }});
 }
 
-
 function calculateDim(numTiles, totalWidth, totalHeight) {
     var area = totalWidth * totalHeight;
     var tArea = area / (1.2 * numTiles);
     var dim = Math.floor(Math.sqrt(tArea));
     return dim;
 }
-
 
 var timbreWeight = 1, pitchWeight = 10, 
     loudStartWeight = 1, loudMaxWeight = 1, 
@@ -854,7 +871,6 @@ function setTunedURL() {
 function now() {
     return new Date().getTime();
 }
-
 
 // we want to find the best, long backwards branch
 // and ensure that it is included in the graph to
@@ -1574,12 +1590,18 @@ function keydown(evt) {
 		actual_transition = 0;
 		B_Tile = 0;
 		false_negativeT = 0;
+		totalS = 1;
+		//totalS = 20;
+		bonusN = 0;
+		bonusP = 0;
 		flag = false;
 		flagN = false;
+		flagD = false;
 		document.getElementById("demo").innerHTML = Number(actual_transition).toString(10);
 		document.getElementById("demo1").innerHTML = Number(detected_transition).toString(10);
 		document.getElementById("demo2").innerHTML = Number(false_positiveT).toString(10);
 		document.getElementById("demo3").innerHTML = Number(false_negativeT).toString(10);
+		document.getElementById("demo4").innerHTML = Number(totalS).toString(10);
         if (driver.isRunning()) {
 			driver.stop();
             ga_track('main', 'key-stop', '');
@@ -1593,7 +1615,20 @@ function keydown(evt) {
 	{
 		if(flag)
 		{
-			detected_transition++;
+			if(flagD)
+			{	
+				bonusN = 0;
+				if(bonusP >= 0)
+				{
+					bonusP++;
+				}
+				detected_transition++;
+				totalS += (5 - beats_since_branch) * bonusP;
+				//totalS += (5 - beats_since_branch);
+				flagD = false;
+			}
+			//detected_transition++;
+			//totalS++;
 			flagN = false;
 			document.getElementById("demo1").innerHTML = Number(detected_transition).toString(10);;
 			console.log(" ");
@@ -1602,11 +1637,33 @@ function keydown(evt) {
 		}
 		else
 		{
+			bonusP = 0;
+			if(bonusN >= 0)
+			{
+				bonusN++;
+			}
 			false_positiveT++;
+			if(bonusN >= 4)
+			{		
+				totalS -= (bonusN - 2)*(bonusN - 1);
+			}
+			else
+			{
+				totalS--;
+			}
 			document.getElementById("demo2").innerHTML = Number(false_positiveT).toString(10);
 			console.log(" ");
 			console.log("FALSE POSITIVE TRANSITIONS: " + false_positiveT);
 			console.log(" ");
+		}
+		
+		document.getElementById("demo4").innerHTML = Number(totalS).toString(10);
+
+		if (totalS <= 0 && driver.isRunning()) 
+		{
+			driver.stop();
+            ga_track('main', 'key-stop', '');
+			//document.getElementById("myImg").src = "http://bbsimg.ngfiles.com/1/24409000/ngbbs50e4c67b0376b.jpg";
 		}
 	}
 }
@@ -1684,6 +1741,7 @@ function init() {
                 driver.stop();
                 ga_track('main', 'stop', track.id);
             } else {
+				console.log("click play");
                 driver.start();
                 ga_track('main', 'start', track.id);
             }
@@ -2047,9 +2105,33 @@ function Driver(player) {
 					flag = false;
 					if(flagN)
 					{
+						if(bonusN >= 0)
+						{
+							bonusN++;
+						}
+						if(bonusN >= 5)
+						{		
+							totalS -= (bonusN - 3)*(bonusN - 2);
+						}
+						else
+						{
+							totalS--;
+						}
 						false_negativeT++; 
 						flagN = false;
+						
 						document.getElementById("demo3").innerHTML = Number(false_negativeT).toString(10);
+						document.getElementById("demo4").innerHTML = Number(totalS).toString(10);
+						if (totalS <= 0 && driver.isRunning()) 
+						{
+							console.log("False Negative End Game");
+							driver.stop();
+							console.log("Drive Stops");
+							//ga_track('main', 'key-stop', '');
+							//ga_track('main', 'stop', '');
+							//console.log("GA TRACK");
+							//document.getElementById("myImg").src = "http://bbsimg.ngfiles.com/1/24409000/ngbbs50e4c67b0376b.jpg";
+						}
 					}
 				}
 				return tile;
@@ -2069,6 +2151,7 @@ function Driver(player) {
 			B_Tile = tile.which;
 			flag = true;
 			flagN = true;
+			flagD = true;
 			beats_since_branch = 0;
 			actual_transition++;
 			document.getElementById("demo").innerHTML = Number(actual_transition).toString(10);
